@@ -2,12 +2,15 @@ import styles from "../../styles/Product.module.css";
 import Image from "next/image";
 import { useState } from "react";
 import axios from "axios";
+import {useDispatch} from "react-redux";
+import {addProduct} from "../../redux/cartSlice";
 
 const Product = ({pizza}) => {
   const [size, setSize] = useState(0);
   const [price, setPrice] = useState(pizza.prices[0]);
   const [extras, setExtras] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch()
 
   const changePrice = (number) => {
     setPrice(price + number)
@@ -30,6 +33,9 @@ const Product = ({pizza}) => {
     }
   }
 
+  const handleAddClick = () => {
+    dispatch(addProduct({...pizza, extras, price, quantity}))
+  }
   return (
     <div className={styles.container}>
       <div className={styles.left}>
@@ -39,7 +45,7 @@ const Product = ({pizza}) => {
       </div>
       <div className={styles.right}>
         <h1 className={styles.title}>{pizza.title}</h1>
-        <span className={styles.price}>${pizza.prices[size]}</span>
+        <span className={styles.price}>${price*quantity}</span>
         <p className={styles.desc}>{pizza.desc}</p>
         <h3 className={styles.choose}>Choose the size</h3>
         <div className={styles.sizes}>
@@ -71,33 +77,7 @@ const Product = ({pizza}) => {
               </div>
           ))}
 
-          <div className={styles.option}>
-            <input
-              className={styles.checkbox}
-              type="checkbox"
-              id="cheese"
-              name="cheese"
-            />
-            <label htmlFor="cheese">Extra Cheese</label>
-          </div>
-          <div className={styles.option}>
-            <input
-              className={styles.checkbox}
-              type="checkbox"
-              id="spicy"
-              name="spicy"
-            />
-            <label htmlFor="spicy">Spicy Sauce</label>
-          </div>
-          <div className={styles.option}>
-            <input
-              className={styles.checkbox}
-              type="checkbox"
-              id="garlic"
-              name="garlic"
-            />
-            <label htmlFor="garlic">Garlic Sauce</label>
-          </div>
+
         </div>
         <div className={styles.add}>
             <input
@@ -106,7 +86,9 @@ const Product = ({pizza}) => {
                 defaultValue={1}
                 className={styles.quantity}
             />
-            <button className={styles.button}>Add to Cart</button>
+            <button className={styles.button} onClick={handleAddClick}>
+              Add to Cart
+            </button>
         </div>
       </div>
     </div>
