@@ -1,10 +1,98 @@
 import styles from "../styles/Cart.module.css";
 import Image from "next/image";
 import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
+import {
+    PayPalScriptProvider,
+    PayPalButtons,
+    usePayPalScriptReducer
+} from "@paypal/react-paypal-js";
+import axios from "axios";
+import {useRouter} from "next/router";
+import {reset} from "../redux/cartSlice";
+import OrderDetails from "../components/OrderDetails";
+
 
 const Cart = () => {
+
+    const [open, setOpen] = useState(false)
+    const [cash, setCash] = useState(false)
     const dispatch = useDispatch()
     const cart = useSelector(state => state.cart)
+
+    const amount = cart.total;
+    const currency = "USD";
+    const style = {"layout":"vertical"};
+
+    const router = useRouter()
+
+    const createOrder = async (data) => {
+        try{
+            const res = await axios.post("http://localhost:3000/api/orders", data)
+            res.status === 201 && router.push("/orders/"+res.data._id)
+            dispatch(reset)
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const ButtonWrapper = ({ currency, showSpinner }) => {
+        // usePayPalScriptReducer can be use only inside children of PayPalScriptProviders
+        // This is the main reason to wrap the PayPalButtons in a new component
+        const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
+
+        useEffect(() => {
+            dispatch({
+                type: "resetOptions",
+                value: {
+                    ...options,
+                    currency: currency,
+                },
+            });
+        }, [currency, showSpinner]);
+
+
+        return (<>
+                { (showSpinner && isPending) && <div className="spinner" /> }
+                <PayPalButtons
+                    style={style}
+                    disabled={false}
+                    forceReRender={[amount, currency, style]}
+                    fundingSource={undefined}
+                    createOrder={(data, actions) => {
+                        return actions.order
+                            .create({
+                                purchase_units: [
+                                    {
+                                        amount: {
+                                            currency_code: currency,
+                                            value: amount,
+                                        },
+                                    },
+                                ],
+                            })
+                            .then((orderId) => {
+                                // Your code here after create the order
+                                return orderId;
+                            });
+                    }}
+                    onApprove={function (data, actions) {
+                        return actions.order.capture().then(function (details) {
+                            // Your code here after capture the order
+                            const shipping = details.purchase_units[0].shipping
+                            createOrder({
+                                customer: shipping.name.full_name,
+                                address: shipping.address.address_line_1,
+                                total: cart.total,
+                                method: 1
+                            })
+                        });
+                    }}
+                />
+            </>
+        );
+    }
+
 
     console.log("product _id>??", cart.products)
     return (
@@ -66,9 +154,32 @@ const Cart = () => {
                     <div className={styles.totalText}>
                         <b className={styles.totalTextTitle}>Total:</b>${cart.total}
                     </div>
-                    <button className={styles.button}>
-                        CHECKOUT NOW!
-                    </button>
+
+                    <div className={styles.paymentMethods}>
+                        <button
+                            onClick={() => setCash(true)}
+                            className={styles.payButton}>CASH ON DELIVERY</button>
+                    <PayPalScriptProvider
+                        options={{
+                            "client-id": "ASzZ9NmToWkJ9AHwnhckvdm6uYJnuxwQJBjYZ5S5E0pLCuzXs-T6YDTwSaIuZp1U2jcEAIDbXCHYpHJ_",
+                            components: "buttons",
+                            currency: "USD",
+                            "disable-funding": "credit,card,p24"
+                        }}
+                    >
+                        <ButtonWrapper
+                            currency={currency}
+                            showSpinner={false}
+                        />
+                    </PayPalScriptProvider>
+                    </div>
+
+                    {cash && (
+                        <OrderDetails
+                            total={cart.total}
+                            createOrder={createOrder}
+                        />
+                    )}
                 </div>
             </div>
         </div>

@@ -25,5 +25,5 @@ const OrderSchema = new mongoose.Schema({
     },
 }, {timestamps: true})
 
-export default mongoose.models.Product ||
+export default mongoose.models.Order ||
 mongoose.model("Order", OrderSchema)
