@@ -29,18 +29,23 @@ export default function Home({pizzaList, isAdmin}) {
 }
 
 export const getServerSideProps = async (ctx) => {
-    const myCookie = ctx.req?.cookies || ""
-    let isAdmin = false
+    try {
+        const myCookie = ctx.req?.cookies || ""
+        let isAdmin = false
 
-    if (myCookie.token === process.env.TOKEN) {
-        isAdmin = true
-    }
-
-    const res = await axios.get("http://localhost:3000/api/products")
-    return {
-        props: {
-            pizzaList: res.data,
-            isAdmin
+        if (myCookie.token === process.env.TOKEN) {
+            isAdmin = true
         }
+
+        const res = await axios.get("http://localhost:3000/api/products")
+        return {
+            props: {
+                pizzaList: res.data,
+                isAdmin
+            }
+        }
+    }catch (e) {
+        console.log(e);
     }
+
 }
