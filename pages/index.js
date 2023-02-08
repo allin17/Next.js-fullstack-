@@ -10,28 +10,29 @@ import AddButton from "../components/AddButton";
 import Add from "../components/Add";
 
 export default function Home({pizzaList, isAdmin}) {
+    //admin
     const [close, setClose] = useState(true)
 
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Pizza Restaurant in Newyork</title>
-        <meta name="description" content="Best pizza shop in town" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Featured/>
-        {isAdmin && <AddButton setClose={setClose}/>}
-      <PizzaList pizzaList={pizzaList}/>
-        {!close && <Add setClose={setClose}/>}
-    </div>
-  );
+    return (
+        <div className={styles.container}>
+            <Head>
+                <title>🍕 Пицца | Быстрая доставка, скидки до 45%</title>
+                <meta name="description" content="Best pizza shop in town"/>
+                <link rel="icon" href="/12.ico"/>
+            </Head>
+            <Featured/>
+            {isAdmin && <AddButton setClose={setClose}/>}
+            <PizzaList pizzaList={pizzaList}/>
+            {!close && <Add setClose={setClose}/>}
+        </div>
+    );
 }
 
 export const getServerSideProps = async (ctx) => {
     const myCookie = ctx.req?.cookies || ""
     let isAdmin = false
 
-    if(myCookie.token === process.env.TOKEN) {
+    if (myCookie.token === process.env.TOKEN) {
         isAdmin = true
     }
 
@@ -39,7 +40,7 @@ export const getServerSideProps = async (ctx) => {
     return {
         props: {
             pizzaList: res.data,
-             isAdmin
+            isAdmin
         }
     }
 }

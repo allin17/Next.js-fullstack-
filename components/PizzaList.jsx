@@ -1,14 +1,19 @@
 import styles from "../styles/PizzaList.module.css";
 import PizzaCard from "./PizzaCard"
+import {useEffect} from "react";
 
 const PizzaList = ({pizzaList}) => {
+    useEffect(() => {
+    }, [pizzaList])
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>THE BEST PIZZA IN TOWN</h1>
+      <h1 className={styles.title}>ЛУЧШАЯ ПИЦЦА В ГОРОДЕ</h1>
       <p className={styles.desc}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut blandit arcu
-        in pretium molestie. Interdum et malesuada fames acme. Lorem ipsum dolor
-        sit amet, consectetur adipiscing elit.
+          60 МИНУТ ИЛИ ПИЦЦА БЕСПЛАТНО
+          Если мы не успеем доставить любые продукты,
+          кроме сувенирной продукции и соусов, в течение 60 минут,
+          курьер подарит вам сертификат на большую пиццу.
       </p>
       <div className={styles.wrapper}>
           {pizzaList.map((pizza) => (

@@ -1,6 +1,7 @@
 .container {
   padding: 50px;
   display: flex;
+  flex-direction: column;
 }
 
 .left {
@@ -80,6 +81,7 @@
   margin-top: 20px;
   cursor: not-allowed;
 }
+
 
 @media screen and (max-width: 480px) {
   .container {

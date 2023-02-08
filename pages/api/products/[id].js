@@ -4,8 +4,11 @@ import Product from "../../../models/Product";
 export default async function handler(req, res) {
     const {
         method,
-        query: {id}
+        query: {id},
+        cookies
     } = req
+
+    const token = cookies.token
 
     dbConnect()
         .then(() => console.log("Connected"))
@@ -21,6 +24,9 @@ export default async function handler(req, res) {
     }
 
     if(method === "PUT") {
+        if(!token || token !== process.env.TOKEN) {
+            return res.status(401).json("Not authenticated!")
+        }
         try {
             const product = await Product.findByIdAndUpdate(
                 id, req.body, {
@@ -34,6 +40,9 @@ export default async function handler(req, res) {
     }
 
     if(method === "DELETE") {
+        if(!token || token !== process.env.TOKEN) {
+            return res.status(401).json("Not authenticated!")
+        }
         console.log(req)
         try {
             await Product.findByIdAndDelete(id)

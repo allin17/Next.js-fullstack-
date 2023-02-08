@@ -1,10 +1,16 @@
 import Footer from "./Footer";
 import Navbar from "./Navbar";
+import {useState} from "react";
+import Menu from "./Menu";
 
 const Layout = ({ children }) => {
-  return (
+
+    //hamburger
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+    return (
     <>
-      <Navbar />
+      <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}/>
       {children}
       <Footer />
     </>
